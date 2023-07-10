@@ -18,6 +18,7 @@ package quantitative
 
 import rudiments.*
 import spectacular.*
+import anticipation.*
 
 import scala.quoted.*
 
@@ -25,6 +26,11 @@ object TallyQuaques:
   opaque type Tally[UnitsType <: Tuple] = Long
 
   object Tally:
+    transparent inline given add
+        [TallyUnitsType <: Tuple]
+        : Add[Tally[TallyUnitsType], Tally[TallyUnitsType]] =
+      ${QuantitativeMacros.addTallyTypeclass[TallyUnitsType]}
+
     def fromLong[UnitsType <: Tuple](long: Long): Tally[UnitsType] = long
     
     inline def apply[UnitsType <: Tuple](inline values: Int*): Tally[UnitsType] =
@@ -40,9 +46,9 @@ object TallyQuaques:
     def longValue: Long = tally
     
   extension [UnitsType <: Tuple](inline tally: Tally[UnitsType])
-    @targetName("add")
-    inline def +(right: Tally[UnitsType]): Tally[UnitsType] =
-      ${QuantitativeMacros.addTally[UnitsType]('tally, 'right)}
+    // @targetName("add")
+    // inline def +(right: Tally[UnitsType]): Tally[UnitsType] =
+    //   ${QuantitativeMacros.addTally[UnitsType]('tally, 'right)}
 
     inline def apply[UnitType[PowerType <: Nat] <: Units[PowerType, ? <: Dimension]]: Int =
       ${QuantitativeMacros.get[UnitsType, UnitType[1]]('tally)}

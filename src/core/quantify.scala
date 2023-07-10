@@ -359,6 +359,26 @@ object Quantitative:
     transparent inline given multiply[LeftType <: Measure, RightType <: Measure]
         : Multiply[Quantity[LeftType], Quantity[RightType]] =
       ${QuantitativeMacros.multiplyTypeclass[LeftType, RightType]}
+    
+    inline given multiplyDouble[RightType <: Measure]: Multiply[Double, Quantity[RightType]] with
+      type Result = Quantity[RightType]
+      def apply(left: Double, right: Quantity[RightType]): Quantity[RightType] =
+        Quantity(right.value*left)
+
+    inline given multiplyInt[RightType <: Measure]: Multiply[Int, Quantity[RightType]] with
+      type Result = Quantity[RightType]
+      def apply(left: Int, right: Quantity[RightType]): Quantity[RightType] =
+        Quantity(right.value*left.toDouble)
+
+    inline given multiplyDouble2[LeftType <: Measure]: Multiply[Quantity[LeftType], Double] with
+      type Result = Quantity[LeftType]
+      def apply(left: Quantity[LeftType], right: Double): Quantity[LeftType] =
+        Quantity(right*left.value)
+
+    inline given multiplyInt2[LeftType <: Measure]: Multiply[Quantity[LeftType], Int] with
+      type Result = Quantity[LeftType]
+      def apply(left: Quantity[LeftType], right: Int): Quantity[LeftType] =
+        Quantity(right.toDouble*left)
 
     inline def apply[UnitsType <: Measure](value: Double): Quantity[UnitsType] = value
     
@@ -422,23 +442,23 @@ val Second: MetricUnit[Seconds[1]] = MetricUnit(1)
 val Radian: MetricUnit[Radians[1]] = MetricUnit(1)
 
 extension [UnitsType <: Measure](inline quantity: Quantity[UnitsType])
-  @targetName("plus")
-  transparent inline def +[UnitsType2 <: Measure](quantity2: Quantity[UnitsType2]): Any =
-    ${QuantitativeMacros.add[UnitsType, UnitsType2]('quantity, 'quantity2, '{false})}
+  // @targetName("plus")
+  // transparent inline def +[UnitsType2 <: Measure](quantity2: Quantity[UnitsType2]): Any =
+  //   ${QuantitativeMacros.add[UnitsType, UnitsType2]('quantity, 'quantity2, '{false})}
   
-  @targetName("minus")
-  transparent inline def -[UnitsType2 <: Measure](quantity2: Quantity[UnitsType2]): Any =
-    ${QuantitativeMacros.add[UnitsType, UnitsType2]('quantity, 'quantity2, '{true})}
+  // @targetName("minus")
+  // transparent inline def -[UnitsType2 <: Measure](quantity2: Quantity[UnitsType2]): Any =
+  //   ${QuantitativeMacros.add[UnitsType, UnitsType2]('quantity, 'quantity2, '{true})}
 
   transparent inline def invert: Any = Quantity[Measure](1.0)/quantity
 
   transparent inline def in[UnitsType2[power <: Nat] <: Units[power, ?]]: Any =
     ${QuantitativeMacros.norm[UnitsType, UnitsType2]('quantity)}
   
-  @targetName("times2")
-  transparent inline def *
-      [UnitsType2 <: Measure](@convertible inline quantity2: Quantity[UnitsType2]): Any =
-    ${QuantitativeMacros.multiply[UnitsType, UnitsType2]('quantity, 'quantity2, false)}
+  // @targetName("times2")
+  // transparent inline def *
+  //     [UnitsType2 <: Measure](@convertible inline quantity2: Quantity[UnitsType2]): Any =
+  //   ${QuantitativeMacros.multiply[UnitsType, UnitsType2]('quantity, 'quantity2, false)}
   
   @targetName("divide2")
   transparent inline def /
@@ -451,8 +471,8 @@ extension [UnitsType <: Measure](inline quantity: Quantity[UnitsType])
   inline def dimension: Text = ${QuantitativeMacros.describe[UnitsType]}
 
 extension (value: Double)
-  @targetName("times")
-  def *[UnitsType <: Measure](quantity: Quantity[UnitsType]): Quantity[UnitsType] = quantity*value
+  // @targetName("times")
+  // def *[UnitsType <: Measure](quantity: Quantity[UnitsType]): Quantity[UnitsType] = quantity*value
   
   @targetName("divide")
   transparent inline def /[UnitsType <: Measure](quantity: Quantity[UnitsType]): Any =

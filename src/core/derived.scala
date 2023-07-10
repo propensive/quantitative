@@ -16,6 +16,8 @@
 
 package quantitative
 
+import anticipation.*
+
 import language.experimental.captureChecking
 
 val Hertz = MetricUnit(1.0/Second)

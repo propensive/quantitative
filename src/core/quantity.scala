@@ -315,6 +315,8 @@ object QuantitativeMacros:
       [LeftType <: Measure: Type, RightType <: Measure: Type]
       (using Quotes)
       : Expr[Multiply[Quantity[LeftType], Quantity[RightType]]] =
+    import quotes.reflect.*
+
     val left = UnitsMap[LeftType]
     val right = UnitsMap[RightType]
 
@@ -330,6 +332,9 @@ object QuantitativeMacros:
               ${QuantitativeMacros.multiply[LeftType, RightType]('left, 'right, false)}
                 .asInstanceOf[Quantity[resultType]]
         }
+      
+      case None =>
+        fail(msg"could not find an instance of ${(leftNorm*rightNorm).toString}")
 
   def greaterThan
       [LeftType <: Measure: Type, RightType <: Measure: Type]
@@ -382,7 +387,14 @@ object QuantitativeMacros:
       [LeftType <: Measure: Type, RightType <: Measure: Type]
       (using Quotes)
       : Expr[Add[Quantity[LeftType], Quantity[RightType]]] =
-    val (units, _) = normalize(UnitsMap[LeftType], UnitsMap[RightType], '{0.0})
+    
+    val left: UnitsMap = UnitsMap[LeftType]
+    val right: UnitsMap = UnitsMap[RightType]
+
+    val (units, _) = normalize(left, right, '{0.0})
+    val (otherUnits, _) = normalize(right, left, '{0.0})
+
+    if units != otherUnits then incompatibleTypes(units, otherUnits)
 
     (units.repr.map(_.asType): @unchecked) match
       case Some('[type resultType <: Measure; resultType]) =>
@@ -493,6 +505,20 @@ object QuantitativeMacros:
             """)
     
     '{Tally.fromLong[UnitsType](${recur(bitSlices[UnitsType].reverse, inputs, '{0L})})}
+
+  def addTallyTypeclass
+      [TallyUnitsType <: Tuple: Type]
+      (using Quotes)
+      : Expr[Add[Tally[TallyUnitsType], Tally[TallyUnitsType]]] =
+
+    '{
+      new Add[Tally[TallyUnitsType], Tally[TallyUnitsType]]:
+        type Result = Tally[TallyUnitsType]
+        def apply
+            (left: Tally[TallyUnitsType], right: Tally[TallyUnitsType], subtract: Boolean)
+            : Tally[TallyUnitsType] =
+          ${QuantitativeMacros.addTally[TallyUnitsType]('left, 'right)}
+    }
 
   def addTally
       [TallyUnitsType <: Tuple: Type]

@@ -16,6 +16,8 @@
 
 package quantitative
 
+import anticipation.*
+
 import language.experimental.captureChecking
 
 val Galileo = MetricUnit(0.01*Metre/(Second*Second))

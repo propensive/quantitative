@@ -16,6 +16,8 @@
 
 package quantitative
 
+import anticipation.*
+
 import language.experimental.captureChecking
 
 class MetricPrefix(val name: String, val symbol: String, val exponent: Int, val base: 2 | 10):

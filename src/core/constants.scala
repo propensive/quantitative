@@ -16,6 +16,8 @@
 
 package quantitative
 
+import anticipation.*
+
 import language.experimental.captureChecking
 
 package constants:

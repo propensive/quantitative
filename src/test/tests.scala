@@ -18,6 +18,7 @@ package quantitative
 
 import probably.*
 import rudiments.*
+import anticipation.*
 import gossamer.{t, Decimalizer}
 import larceny.*
 import spectacular.*
